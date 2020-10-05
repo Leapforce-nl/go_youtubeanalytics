@@ -31,7 +31,7 @@ func NewYoutube(clientID string, clientSecret string, scope string, bigQuery *bi
 	return &yt, nil
 }
 
-func (yt *Youtube) ValidateToken() error {
+func (yt *Youtube) ValidateToken() (*oauth2.Token, error) {
 	return yt.oAuth2.ValidateToken()
 }
 

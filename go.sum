@@ -49,6 +49,8 @@ github.com/Leapforce-nl/go_errortools v0.0.0-20200218173102-e74ff3d10089 h1:HkMV
 github.com/Leapforce-nl/go_errortools v0.0.0-20200218173102-e74ff3d10089/go.mod h1:goG+xW3RRxvv/HpoxmaTFMdH+a/YeiZseoGzL9RwBAE=
 github.com/Leapforce-nl/go_oauth2 v0.0.0-20200928124310-e44ece792c88 h1:ii8qAm9NX6INLXGp9o8Gvv7nFFA7e3peF4hrJzc0Cc8=
 github.com/Leapforce-nl/go_oauth2 v0.0.0-20200928124310-e44ece792c88/go.mod h1:lI1cb81JE9c5oyOQrWINwm1qCLowa9/bCT/m/GKwU/M=
+github.com/Leapforce-nl/go_oauth2 v0.0.0-20201005221316-b5afa998a68f h1:LkfClSoNe+W3I2Y//gJNnSTOE3WyiWa8YW3sbq0Z/5k=
+github.com/Leapforce-nl/go_oauth2 v0.0.0-20201005221316-b5afa998a68f/go.mod h1:lI1cb81JE9c5oyOQrWINwm1qCLowa9/bCT/m/GKwU/M=
 github.com/Leapforce-nl/go_types v0.0.0-20200126202922-ba4900de15b8 h1:q0/mdn+TnZqBB439lOeuLPHPnQaVYCQL2B4BRLbCbuQ=
 github.com/Leapforce-nl/go_types v0.0.0-20200126202922-ba4900de15b8/go.mod h1:AuUJ0pyk3Xc6IgEuzCr5NvEl277YQwiIgJ12/SfmByI=
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqRtAwp2Xwc6WNPJEufxJ7fx3npB4UV/JOLmbu5I0=
