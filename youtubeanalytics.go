@@ -1,4 +1,4 @@
-package Youtube
+package YoutubeAnalytics
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	apiName         string = "Youtube"
+	apiName         string = "YoutubeAnalytics"
 	apiURL          string = "https://youtubeanalytics.googleapis.com/v2"
 	authURL         string = "https://accounts.google.com/o/oauth2/v2/auth"
 	tokenURL        string = "https://oauth2.googleapis.com/token"
@@ -17,29 +17,29 @@ const (
 	redirectURL     string = "http://localhost:8080/oauth/redirect"
 )
 
-// Youtube stores Youtube configuration
+// YoutubeAnalytics stores YoutubeAnalytics configuration
 //
-type Youtube struct {
+type YoutubeAnalytics struct {
 	oAuth2 *oauth2.OAuth2
 }
 
 // methods
 //
-func NewYoutube(clientID string, clientSecret string, scope string, bigQuery *bigquerytools.BigQuery, isLive bool) (*Youtube, error) {
-	yt := Youtube{}
+func NewYoutube(clientID string, clientSecret string, scope string, bigQuery *bigquerytools.BigQuery, isLive bool) (*YoutubeAnalytics, error) {
+	yt := YoutubeAnalytics{}
 	yt.oAuth2 = oauth2.NewOAuth(apiName, clientID, clientSecret, scope, redirectURL, authURL, tokenURL, tokenHTTPMethod, bigQuery, isLive)
 	return &yt, nil
 }
 
-func (yt *Youtube) ValidateToken() (*oauth2.Token, error) {
+func (yt *YoutubeAnalytics) ValidateToken() (*oauth2.Token, error) {
 	return yt.oAuth2.ValidateToken()
 }
 
-func (yt *Youtube) InitToken() error {
+func (yt *YoutubeAnalytics) InitToken() error {
 	return yt.oAuth2.InitToken()
 }
 
-func (yt *Youtube) Get(url string, model interface{}) (*http.Response, error) {
+func (yt *YoutubeAnalytics) Get(url string, model interface{}) (*http.Response, error) {
 	res, err := yt.oAuth2.Get(url, model)
 
 	if err != nil {
@@ -49,7 +49,7 @@ func (yt *Youtube) Get(url string, model interface{}) (*http.Response, error) {
 	return res, nil
 }
 
-func (yt *Youtube) Patch(url string, model interface{}) (*http.Response, error) {
+func (yt *YoutubeAnalytics) Patch(url string, model interface{}) (*http.Response, error) {
 	res, err := yt.oAuth2.Patch(url, nil, model)
 
 	if err != nil {
