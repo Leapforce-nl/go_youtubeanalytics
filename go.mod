@@ -1,4 +1,4 @@
-module github.com/Leapforce-nl/go_youtube
+module github.com/leapforce-libraries/go_youtube
 
 go 1.13
 
