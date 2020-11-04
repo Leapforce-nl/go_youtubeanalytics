@@ -3,9 +3,9 @@ package Youtube
 import (
 	"net/http"
 
-	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
+	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 
-	oauth2 "github.com/Leapforce-nl/go_oauth2"
+	oauth2 "github.com/leapforce-libraries/go_oauth2"
 )
 
 const (
