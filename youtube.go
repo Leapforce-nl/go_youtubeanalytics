@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
-
+	errortools "github.com/leapforce-libraries/go_errortools"
 	oauth2 "github.com/leapforce-libraries/go_oauth2"
 )
 
@@ -25,7 +25,7 @@ type Youtube struct {
 
 // methods
 //
-func NewYoutube(clientID string, clientSecret string, scope string, bigQuery *bigquerytools.BigQuery, isLive bool) (*Youtube, error) {
+func NewYoutube(clientID string, clientSecret string, scope string, bigQuery *bigquerytools.BigQuery, isLive bool) *Youtube {
 	yt := Youtube{}
 	config := oauth2.OAuth2Config{
 		ApiName:         apiName,
@@ -38,32 +38,32 @@ func NewYoutube(clientID string, clientSecret string, scope string, bigQuery *bi
 		TokenHTTPMethod: tokenHTTPMethod,
 	}
 	yt.oAuth2 = oauth2.NewOAuth(config, bigQuery, isLive)
-	return &yt, nil
+	return &yt
 }
 
-func (yt *Youtube) ValidateToken() (*oauth2.Token, error) {
+func (yt *Youtube) ValidateToken() (*oauth2.Token, *errortools.Error) {
 	return yt.oAuth2.ValidateToken()
 }
 
-func (yt *Youtube) InitToken() error {
+func (yt *Youtube) InitToken() *errortools.Error {
 	return yt.oAuth2.InitToken()
 }
 
-func (yt *Youtube) Get(url string, model interface{}) (*http.Response, error) {
-	res, err := yt.oAuth2.Get(url, model)
+func (yt *Youtube) Get(url string, model interface{}) (*http.Response, *errortools.Error) {
+	_, res, e := yt.oAuth2.Get(url, model, nil)
 
-	if err != nil {
-		return nil, err
+	if e != nil {
+		return nil, e
 	}
 
 	return res, nil
 }
 
-func (yt *Youtube) Patch(url string, model interface{}) (*http.Response, error) {
-	res, err := yt.oAuth2.Patch(url, nil, model)
+func (yt *Youtube) Patch(url string, model interface{}) (*http.Response, *errortools.Error) {
+	_, res, e := yt.oAuth2.Patch(url, nil, model, nil)
 
-	if err != nil {
-		return nil, err
+	if e != nil {
+		return nil, e
 	}
 
 	return res, nil
