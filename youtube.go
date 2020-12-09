@@ -28,7 +28,7 @@ type Youtube struct {
 func NewYoutube(clientID string, clientSecret string, scope string, bigQuery *bigquerytools.BigQuery) *Youtube {
 	yt := Youtube{}
 	config := oauth2.OAuth2Config{
-		ApiName:         apiName,
+		APIName:         apiName,
 		ClientID:        clientID,
 		ClientSecret:    clientSecret,
 		Scope:           scope,
