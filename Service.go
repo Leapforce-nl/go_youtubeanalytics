@@ -29,3 +29,8 @@ func NewService(clientID string, clientSecret string, scope string, bigQuery *go
 
 	return &Service{googleService}
 }
+
+func (service *Service) InitToken() *errortools.Error {
+	return service.googleService.InitToken()
+}
+
