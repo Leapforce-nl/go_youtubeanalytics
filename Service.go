@@ -1,6 +1,7 @@
 package Service
 
 import (
+	errortools "github.com/leapforce-libraries/go_errortools"
 	google "github.com/leapforce-libraries/go_google"
 )
 
@@ -33,4 +34,3 @@ func NewService(clientID string, clientSecret string, scope string, bigQuery *go
 func (service *Service) InitToken() *errortools.Error {
 	return service.googleService.InitToken()
 }
-
