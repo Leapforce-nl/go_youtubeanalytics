@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_google "github.com/leapforce-libraries/go_google"
@@ -19,18 +20,19 @@ const (
 // Service stores Service configuration
 //
 type Service struct {
-	apiKey      string
-	httpService *go_http.Service
-	quotaCosts  int64
+	key           string
+	apiKey        *string
+	accessToken   *string
+	httpService   *go_http.Service
+	googleService *go_google.Service
+	quotaCosts    int64
 }
 
-type ServiceConfig struct {
+type ServiceConfigWithAPIKey struct {
 	APIKey string
 }
 
-// methods
-//
-func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
+func NewServiceWithAPIKey(serviceConfig *ServiceConfigWithAPIKey) (*Service, *errortools.Error) {
 	if serviceConfig == nil {
 		return nil, errortools.ErrorMessage("ServiceConfig must not be a nil pointer")
 	}
@@ -45,14 +47,51 @@ func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
 	}
 
 	return &Service{
-		apiKey:      serviceConfig.APIKey,
+		key:         serviceConfig.APIKey,
+		apiKey:      &serviceConfig.APIKey,
+		httpService: httpService,
+	}, nil
+}
+
+type ServiceConfigWithAccessToken struct {
+	ClientID    string
+	AccessToken string
+}
+
+func NewServiceWithAccessToken(serviceConfig *ServiceConfigWithAccessToken) (*Service, *errortools.Error) {
+	if serviceConfig == nil {
+		return nil, errortools.ErrorMessage("ServiceConfig must not be a nil pointer")
+	}
+
+	if serviceConfig.AccessToken == "" {
+		return nil, errortools.ErrorMessage("AccessToken not provided")
+	}
+
+	httpService, e := go_http.NewService(&go_http.ServiceConfig{})
+	if e != nil {
+		return nil, e
+	}
+
+	clientIDParts := strings.Split(serviceConfig.ClientID, ".")
+
+	return &Service{
+		accessToken: &serviceConfig.AccessToken,
+		key:         clientIDParts[0],
 		httpService: httpService,
 	}, nil
 }
 
 func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
-	// add api key
-	requestConfig.SetParameter("key", service.apiKey)
+	if service.apiKey != nil {
+		// add api key
+		requestConfig.SetParameter("key", *service.apiKey)
+	}
+	if service.accessToken != nil {
+		// add accesstoken to header
+		header := http.Header{}
+		header.Set("Authorization", fmt.Sprintf("Bearer %s", *service.accessToken))
+		requestConfig.NonDefaultHeaders = &header
+	}
 
 	responseModel := requestConfig.ResponseModel
 
@@ -103,7 +142,7 @@ func (service *Service) APIName() string {
 }
 
 func (service *Service) APIKey() string {
-	return service.apiKey
+	return service.key
 }
 
 func (service *Service) APICallCount() int64 {
