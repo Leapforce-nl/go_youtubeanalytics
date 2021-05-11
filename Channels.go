@@ -102,6 +102,7 @@ func (service *Service) GetChannels(getChannelsConfig *GetChannelsConfig) (*[]Ch
 		Parameters:    &values,
 		ResponseModel: &channels,
 	}
+	service.pay(1)
 	_, _, response, e := service.get(&requestConfig)
 	if e != nil {
 		return nil, nil, e
