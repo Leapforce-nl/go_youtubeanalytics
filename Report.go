@@ -90,20 +90,10 @@ func (service *Service) GetReport(getReportConfig *GetReportConfig) (*Report, *e
 		ResponseModel: &report,
 	}
 	service.pay(1)
-	_, _, _, e := service.get(&requestConfig)
+	_, _, e := service.get(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
 
 	return &report, nil
 }
-
-/*
-curl \
-  'https://youtubeanalytics.googleapis.com/v2/reports?dimensions=elapsedVideoTimeRatio&endDate=2018-05-01&filters=video%3D%3Dso1yeplRB80%3BaudienceType%3D%3DORGANIC&ids=channel%3D%3DMINE&metrics=audienceWatchRatio%2CrelativeRetentionPerformance&startDate=2017-01-01&key=[YOUR_API_KEY]' \
-  --header 'Authorization: Bearer [YOUR_ACCESS_TOKEN]' \
-  --header 'Accept: application/json' \
-  --compressed
-
-
-*/

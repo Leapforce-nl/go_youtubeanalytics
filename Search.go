@@ -316,7 +316,7 @@ func (service *Service) Search(searchConfig *SearchConfig) (*[]SearchResult, *st
 		ResponseModel: &searchResults,
 	}
 	service.pay(100)
-	_, _, response, e := service.get(&requestConfig)
+	_, _, response, e := service.getWrapped(&requestConfig)
 	if e != nil {
 		return nil, nil, e
 	}

@@ -135,7 +135,7 @@ func (service *Service) GetVideos(getVideosConfig *GetVideosConfig) (*[]Video, *
 		ResponseModel: &videos,
 	}
 	service.pay(1)
-	_, _, response, e := service.get(&requestConfig)
+	_, _, response, e := service.getWrapped(&requestConfig)
 	if e != nil {
 		return nil, nil, e
 	}

@@ -103,7 +103,7 @@ func (service *Service) GetChannels(getChannelsConfig *GetChannelsConfig) (*[]Ch
 		ResponseModel: &channels,
 	}
 	service.pay(1)
-	_, _, response, e := service.get(&requestConfig)
+	_, _, response, e := service.getWrapped(&requestConfig)
 	if e != nil {
 		return nil, nil, e
 	}

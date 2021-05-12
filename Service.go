@@ -21,7 +21,7 @@ const (
 // Service stores Service configuration
 //
 type Service struct {
-	key           string
+	id            string
 	apiKey        *string
 	accessToken   *string
 	httpService   *go_http.Service
@@ -48,7 +48,7 @@ func NewServiceWithAPIKey(serviceConfig *ServiceConfigWithAPIKey) (*Service, *er
 	}
 
 	return &Service{
-		key:         serviceConfig.APIKey,
+		id:          serviceConfig.APIKey,
 		apiKey:      &serviceConfig.APIKey,
 		httpService: httpService,
 	}, nil
@@ -73,19 +73,18 @@ func NewServiceWithAccessToken(serviceConfig *ServiceConfigWithAccessToken) (*Se
 		return nil, e
 	}
 
-	clientIDParts := strings.Split(serviceConfig.ClientID, ".")
-
 	return &Service{
 		accessToken: &serviceConfig.AccessToken,
-		key:         clientIDParts[0],
+		id:          IDFromClientID(serviceConfig.ClientID),
 		httpService: httpService,
 	}, nil
 }
 
 type ServiceConfigOAuth2 struct {
-	ChannelID    string
-	ClientID     string
-	ClientSecret string
+	ClientID          string
+	ClientSecret      string
+	GetTokenFunction  *func() (*oauth2.Token, *errortools.Error)
+	SaveTokenFunction *func(token *oauth2.Token) *errortools.Error
 }
 
 func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools.Error) {
@@ -100,21 +99,21 @@ func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools
 	if serviceConfig.ClientSecret == "" {
 		return nil, errortools.ErrorMessage("ClientSecret not provided")
 	}
+	/*
+		getTokenFunction := func() (*oauth2.Token, *errortools.Error) {
+			return GetToken(serviceConfig.ClientID, serviceConfig.ChannelID)
+		}
 
-	getTokenFunction := func() (*oauth2.Token, *errortools.Error) {
-		return GetToken(serviceConfig.ClientID, serviceConfig.ChannelID)
-	}
-
-	saveTokenFunction := func(token *oauth2.Token) *errortools.Error {
-		return SaveToken(serviceConfig.ClientID, serviceConfig.ChannelID, token)
-	}
+		saveTokenFunction := func(token *oauth2.Token) *errortools.Error {
+			return SaveToken(serviceConfig.ClientID, serviceConfig.ChannelID, token)
+		}*/
 
 	googleServiceConfig := go_google.ServiceConfig{
 		APIName:           apiName,
 		ClientID:          serviceConfig.ClientID,
 		ClientSecret:      serviceConfig.ClientSecret,
-		GetTokenFunction:  &getTokenFunction,
-		SaveTokenFunction: &saveTokenFunction,
+		GetTokenFunction:  serviceConfig.GetTokenFunction,
+		SaveTokenFunction: serviceConfig.SaveTokenFunction,
 	}
 
 	googleService, e := go_google.NewService(&googleServiceConfig, nil)
@@ -122,15 +121,53 @@ func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools
 		return nil, e
 	}
 
-	clientIDParts := strings.Split(serviceConfig.ClientID, ".")
-
 	return &Service{
-		key:           clientIDParts[0],
+		id:            IDFromClientID(serviceConfig.ClientID),
 		googleService: googleService,
 	}, nil
 }
 
-func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
+func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
+
+	var request *http.Request
+	var response *http.Response
+	var e *errortools.Error
+
+	if service.httpService != nil {
+		// add error model
+		errorResponse := go_google.ErrorResponse{}
+		requestConfig.ErrorModel = &errorResponse
+
+		if service.apiKey != nil {
+			// add api key
+			requestConfig.SetParameter("key", *service.apiKey)
+		}
+		if service.accessToken != nil {
+			// add accesstoken to header
+			header := http.Header{}
+			header.Set("Authorization", fmt.Sprintf("Bearer %s", *service.accessToken))
+			requestConfig.NonDefaultHeaders = &header
+		}
+
+		request, response, e = service.httpService.HTTPRequest(httpMethod, requestConfig)
+
+		if e != nil {
+			if errorResponse.Error.Message != "" {
+				e.SetMessage(errorResponse.Error.Message)
+			}
+		}
+	} else if service.googleService != nil {
+		request, response, e = service.googleService.HTTPRequest(httpMethod, requestConfig)
+	}
+
+	if e != nil {
+		return request, response, e
+	}
+
+	return request, response, nil
+}
+
+func (service *Service) httpRequestWrapped(httpMethod string, requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
 
 	responseModel := requestConfig.ResponseModel
 
@@ -139,50 +176,26 @@ func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.Re
 	_requestConfig := *requestConfig
 	_requestConfig.ResponseModel = &_response
 
-	// add error model
-	errorResponse := go_google.ErrorResponse{}
-	_requestConfig.ErrorModel = &errorResponse
-
-	var request *http.Request
-	var response *http.Response
-	var e *errortools.Error
-
-	if service.httpService != nil {
-
-		if service.apiKey != nil {
-			// add api key
-			_requestConfig.SetParameter("key", *service.apiKey)
-		}
-		if service.accessToken != nil {
-			// add accesstoken to header
-			header := http.Header{}
-			header.Set("Authorization", fmt.Sprintf("Bearer %s", *service.accessToken))
-			_requestConfig.NonDefaultHeaders = &header
-		}
-
-		request, response, e = service.httpService.HTTPRequest(httpMethod, &_requestConfig)
-	} else if service.googleService != nil {
-		request, response, e = service.googleService.HTTPRequest(httpMethod, &_requestConfig)
-	}
-
-	if errorResponse.Error.Message != "" {
-		e.SetMessage(errorResponse.Error.Message)
+	request, response, e := service.httpRequest(httpMethod, &_requestConfig)
+	if e != nil {
+		return request, response, nil, e
 	}
 
 	// unmarshal items
 	err := json.Unmarshal(_response.Items, responseModel)
 	if err != nil {
-		if e == nil {
-			e = new(errortools.Error)
-		}
-		e.SetMessage(err)
+		return request, response, nil, errortools.ErrorMessage(err)
 	}
 
-	return request, response, &_response, e
+	return request, response, &_response, nil
 }
 
-func (service *Service) get(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
+func (service *Service) get(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
 	return service.httpRequest(http.MethodGet, requestConfig)
+}
+
+func (service *Service) getWrapped(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
+	return service.httpRequestWrapped(http.MethodGet, requestConfig)
 }
 
 func (service *Service) urlData(path string) string {
@@ -197,12 +210,16 @@ func (service *Service) pay(quotaCosts int64) {
 	service.quotaCosts += quotaCosts
 }
 
+func IDFromClientID(clientID string) string {
+	return strings.Split(clientID, ".")[0]
+}
+
 func (service *Service) APIName() string {
 	return apiName
 }
 
 func (service *Service) APIKey() string {
-	return service.key
+	return service.id
 }
 
 func (service *Service) APICallCount() int64 {
