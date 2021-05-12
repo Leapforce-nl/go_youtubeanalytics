@@ -9,6 +9,7 @@ import (
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_google "github.com/leapforce-libraries/go_google"
 	go_http "github.com/leapforce-libraries/go_http"
+	oauth2 "github.com/leapforce-libraries/go_oauth2"
 )
 
 const (
@@ -81,17 +82,55 @@ func NewServiceWithAccessToken(serviceConfig *ServiceConfigWithAccessToken) (*Se
 	}, nil
 }
 
+type ServiceConfigOAuth2 struct {
+	ChannelID    string
+	ClientID     string
+	ClientSecret string
+}
+
+func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools.Error) {
+	if serviceConfig == nil {
+		return nil, errortools.ErrorMessage("ServiceConfig must not be a nil pointer")
+	}
+
+	if serviceConfig.ClientID == "" {
+		return nil, errortools.ErrorMessage("ClientID not provided")
+	}
+
+	if serviceConfig.ClientSecret == "" {
+		return nil, errortools.ErrorMessage("ClientSecret not provided")
+	}
+
+	getTokenFunction := func() (*oauth2.Token, *errortools.Error) {
+		return GetToken(serviceConfig.ClientID, serviceConfig.ChannelID)
+	}
+
+	saveTokenFunction := func(token *oauth2.Token) *errortools.Error {
+		return SaveToken(serviceConfig.ClientID, serviceConfig.ChannelID, token)
+	}
+
+	googleServiceConfig := go_google.ServiceConfig{
+		APIName:           apiName,
+		ClientID:          serviceConfig.ClientID,
+		ClientSecret:      serviceConfig.ClientSecret,
+		GetTokenFunction:  &getTokenFunction,
+		SaveTokenFunction: &saveTokenFunction,
+	}
+
+	googleService, e := go_google.NewService(&googleServiceConfig, nil)
+	if e != nil {
+		return nil, e
+	}
+
+	clientIDParts := strings.Split(serviceConfig.ClientID, ".")
+
+	return &Service{
+		key:           clientIDParts[0],
+		googleService: googleService,
+	}, nil
+}
+
 func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
-	if service.apiKey != nil {
-		// add api key
-		requestConfig.SetParameter("key", *service.apiKey)
-	}
-	if service.accessToken != nil {
-		// add accesstoken to header
-		header := http.Header{}
-		header.Set("Authorization", fmt.Sprintf("Bearer %s", *service.accessToken))
-		requestConfig.NonDefaultHeaders = &header
-	}
 
 	responseModel := requestConfig.ResponseModel
 
@@ -104,7 +143,28 @@ func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.Re
 	errorResponse := go_google.ErrorResponse{}
 	_requestConfig.ErrorModel = &errorResponse
 
-	request, response, e := service.httpService.HTTPRequest(httpMethod, &_requestConfig)
+	var request *http.Request
+	var response *http.Response
+	var e *errortools.Error
+
+	if service.httpService != nil {
+
+		if service.apiKey != nil {
+			// add api key
+			_requestConfig.SetParameter("key", *service.apiKey)
+		}
+		if service.accessToken != nil {
+			// add accesstoken to header
+			header := http.Header{}
+			header.Set("Authorization", fmt.Sprintf("Bearer %s", *service.accessToken))
+			_requestConfig.NonDefaultHeaders = &header
+		}
+
+		request, response, e = service.httpService.HTTPRequest(httpMethod, &_requestConfig)
+	} else if service.googleService != nil {
+		request, response, e = service.googleService.HTTPRequest(httpMethod, &_requestConfig)
+	}
+
 	if errorResponse.Error.Message != "" {
 		e.SetMessage(errorResponse.Error.Message)
 	}
