@@ -36,6 +36,10 @@ type GetReportConfig struct {
 }
 
 func (service *Service) GetReport(getReportConfig *GetReportConfig) (*Report, *errortools.Error) {
+	if service.authorizationMode == AuthorizationModeAPIKey {
+		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
+	}
+
 	values := url.Values{}
 
 	if getReportConfig.EndDate != nil {

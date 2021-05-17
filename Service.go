@@ -18,15 +18,24 @@ const (
 	apiURLData      string = "https://youtube.googleapis.com/youtube/v3"
 )
 
+type AuthorizationMode string
+
+const (
+	AuthorizationModeOAuth2      AuthorizationMode = "oauth2"
+	AuthorizationModeAPIKey      AuthorizationMode = "apikey"
+	AuthorizationModeAccessToken AuthorizationMode = "accesstoken"
+)
+
 // Service stores Service configuration
 //
 type Service struct {
-	id            string
-	apiKey        *string
-	accessToken   *string
-	httpService   *go_http.Service
-	googleService *go_google.Service
-	quotaCosts    int64
+	authorizationMode AuthorizationMode
+	id                string
+	apiKey            *string
+	accessToken       *string
+	httpService       *go_http.Service
+	googleService     *go_google.Service
+	quotaCosts        int64
 }
 
 type ServiceConfigWithAPIKey struct {
@@ -48,9 +57,10 @@ func NewServiceWithAPIKey(serviceConfig *ServiceConfigWithAPIKey) (*Service, *er
 	}
 
 	return &Service{
-		id:          serviceConfig.APIKey,
-		apiKey:      &serviceConfig.APIKey,
-		httpService: httpService,
+		authorizationMode: AuthorizationModeAPIKey,
+		id:                serviceConfig.APIKey,
+		apiKey:            &serviceConfig.APIKey,
+		httpService:       httpService,
 	}, nil
 }
 
@@ -74,9 +84,10 @@ func NewServiceWithAccessToken(serviceConfig *ServiceConfigWithAccessToken) (*Se
 	}
 
 	return &Service{
-		accessToken: &serviceConfig.AccessToken,
-		id:          IDFromClientID(serviceConfig.ClientID),
-		httpService: httpService,
+		authorizationMode: AuthorizationModeAccessToken,
+		accessToken:       &serviceConfig.AccessToken,
+		id:                IDFromClientID(serviceConfig.ClientID),
+		httpService:       httpService,
 	}, nil
 }
 
@@ -122,8 +133,9 @@ func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools
 	}
 
 	return &Service{
-		id:            IDFromClientID(serviceConfig.ClientID),
-		googleService: googleService,
+		authorizationMode: AuthorizationModeOAuth2,
+		id:                IDFromClientID(serviceConfig.ClientID),
+		googleService:     googleService,
 	}, nil
 }
 
@@ -179,6 +191,10 @@ func (service *Service) httpRequestWrapped(httpMethod string, requestConfig *go_
 	request, response, e := service.httpRequest(httpMethod, &_requestConfig)
 	if e != nil {
 		return request, response, nil, e
+	}
+
+	if _response.Items == nil {
+		return request, response, nil, errortools.ErrorMessage("Response does not contain any items")
 	}
 
 	// unmarshal items
