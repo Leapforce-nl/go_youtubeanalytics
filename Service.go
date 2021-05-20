@@ -15,6 +15,7 @@ import (
 const (
 	apiName         string = "Youtube"
 	apiURLAnalytics string = "https://youtubeanalytics.googleapis.com/v2"
+	apiURLReporting string = "https://youtubereporting.googleapis.com/v1"
 	apiURLData      string = "https://youtube.googleapis.com/youtube/v3"
 )
 
@@ -214,12 +215,20 @@ func (service *Service) getWrapped(requestConfig *go_http.RequestConfig) (*http.
 	return service.httpRequestWrapped(http.MethodGet, requestConfig)
 }
 
+func (service *Service) post(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
+	return service.httpRequest(http.MethodPost, requestConfig)
+}
+
 func (service *Service) urlData(path string) string {
 	return fmt.Sprintf("%s/%s", apiURLData, path)
 }
 
 func (service *Service) urlAnalytics(path string) string {
 	return fmt.Sprintf("%s/%s", apiURLAnalytics, path)
+}
+
+func (service *Service) apiURLReporting(path string) string {
+	return fmt.Sprintf("%s/%s", apiURLReporting, path)
 }
 
 func (service *Service) pay(quotaCosts int64) {
