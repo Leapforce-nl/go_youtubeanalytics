@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	layout string = "2006-01-02T15:04:05Z"
+	layout1 string = "2006-01-02T15:04:05.999999Z"
+	layout2 string = "2006-01-02T15:04:05Z"
 )
 
 type DateTimeString time.Time
@@ -32,9 +33,12 @@ func (d *DateTimeString) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	_t, err := time.Parse(layout, s)
+	_t, err := time.Parse(layout1, s)
 	if err != nil {
-		return returnError()
+		_t, err = time.Parse(layout2, s)
+		if err != nil {
+			return returnError()
+		}
 	}
 
 	*d = DateTimeString(_t)
@@ -46,7 +50,7 @@ func (d *DateTimeString) MarshalJSON() ([]byte, error) {
 		return json.Marshal(nil)
 	}
 
-	return json.Marshal(time.Time(*d).Format(layout))
+	return json.Marshal(time.Time(*d).Format(layout1))
 }
 
 func (d *DateTimeString) ValuePtr() *time.Time {
@@ -67,5 +71,5 @@ func (d *DateTimeString) String() string {
 		return ""
 	}
 
-	return (time.Time(*d)).Format(layout)
+	return (time.Time(*d)).Format(layout1)
 }
