@@ -3,11 +3,10 @@ package youtube
 import (
 	"encoding/csv"
 	"fmt"
-	"io"
 	"net/url"
-	"reflect"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
+	fileio "github.com/leapforce-libraries/go_fileio"
 	go_http "github.com/leapforce-libraries/go_http"
 	y_types "github.com/leapforce-libraries/go_youtube/types"
 )
@@ -163,39 +162,39 @@ func (service *Service) GetReports(getReportsConfig *GetReportsConfig) (*[]Repor
 }
 
 type BulkReportChannelBasicA2 struct {
-	Date                           string `csv:"date"`
-	ChannelID                      string `csv:"channelId"`
-	VideoID                        string `csv:"videoId"`
-	LiveOrOnDemand                 string `csv:"live_or_on_demand"`
-	SubscribedStatus               string `csv:"subscribed_status"`
-	CountryCode                    string `csv:"countryCode"`
-	Views                          string `csv:"views"`
-	Comments                       string `csv:"comments"`
-	Likes                          string `csv:"likes"`
-	Dislikes                       string `csv:"dislikes"`
-	Shares                         string `csv:"shares"`
-	WatchTimeMinutes               string `csv:"watchTime_minutes"`
-	AverageViewDurationSeconds     string `csv:"average_view_duration_seconds"`
-	AverageViewDurationPercentage  string `csv:"average_view_duration_percentage"`
-	AnnotationImpressions          string `csv:"annotationImpressions"`
-	AnnotationClickableImpressions string `csv:"annotationClickableImpressions"`
-	AnnotationClicks               string `csv:"annotationClicks"`
-	AnnotationClickThroughRate     string `csv:"annotationClickThroughRate"`
-	AnnotationClosableImpressions  string `csv:"annotationClosableImpressions"`
-	AnnotationCloses               string `csv:"annotationCloses"`
-	AnnotationCloseRate            string `csv:"annotationCloseRate"`
-	CardTeaserImpressions          string `csv:"cardTeaserImpressions"`
-	CardTeaserClickRate            string `csv:"cardTeaserClickRate"`
-	CardTeaserClicks               string `csv:"cardTeaserClicks"`
-	CardImpressions                string `csv:"cardImpressions"`
-	CardClicks                     string `csv:"cardClicks"`
-	CardClickRate                  string `csv:"cardClickRate"`
-	SubscribersGained              string `csv:"subscribers_gained"`
-	SubscribersLost                string `csv:"subscribers_lost"`
-	VideosAddedToPlaylists         string `csv:"videos_addedTo_playlists"`
-	VideosRemovedFromPlaylists     string `csv:"videosRemoved_from_playlists"`
-	RedViews                       string `csv:"red_views"`
-	RedWatchTimeMinutes            string `csv:"red_watchTime_minutes"`
+	Date                           y_types.BulkReportDateString `csv:"date"`
+	ChannelID                      string                       `csv:"channel_id"`
+	VideoID                        string                       `csv:"video_id"`
+	LiveOrOnDemand                 string                       `csv:"live_or_on_demand"`
+	SubscribedStatus               string                       `csv:"subscribed_status"`
+	CountryCode                    string                       `csv:"country_code"`
+	Views                          int64                        `csv:"views"`
+	Comments                       int64                        `csv:"comments"`
+	Likes                          int64                        `csv:"likes"`
+	Dislikes                       int64                        `csv:"dislikes"`
+	Shares                         int64                        `csv:"shares"`
+	WatchTimeMinutes               float64                      `csv:"watch_time_minutes"`
+	AverageViewDurationSeconds     float64                      `csv:"average_view_duration_seconds"`
+	AverageViewDurationPercentage  float64                      `csv:"average_view_duration_percentage"`
+	AnnotationImpressions          int64                        `csv:"annotation_impressions"`
+	AnnotationClickableImpressions int64                        `csv:"annotation_clickable_impressions"`
+	AnnotationClicks               int64                        `csv:"annotation_clicks"`
+	AnnotationClickThroughRate     float64                      `csv:"annotation_click_through_rate"`
+	AnnotationClosableImpressions  int64                        `csv:"annotation_closable_impressions"`
+	AnnotationCloses               int64                        `csv:"annotation_closes"`
+	AnnotationCloseRate            float64                      `csv:"annotation_close_rate"`
+	CardTeaserImpressions          int64                        `csv:"card_teaser_impressions"`
+	CardTeaserClicks               int64                        `csv:"card_teaser_clicks"`
+	CardTeaserClickRate            float64                      `csv:"card_teaser_click_rate"`
+	CardImpressions                int64                        `csv:"card_impressions"`
+	CardClicks                     int64                        `csv:"card_clicks"`
+	CardClickRate                  float64                      `csv:"card_click_rate"`
+	SubscribersGained              int64                        `csv:"subscribers_gained"`
+	SubscribersLost                int64                        `csv:"subscribers_lost"`
+	VideosAddedToPlaylists         int64                        `csv:"videos_added_to_playlists"`
+	VideosRemovedFromPlaylists     int64                        `csv:"videos_removed_from_playlists"`
+	RedViews                       int64                        `csv:"red_views"`
+	RedWatchTimeMinutes            float64                      `csv:"red_watch_time_minutes"`
 }
 
 func (service *Service) DownloadReport(url string) (*[]BulkReportChannelBasicA2, *errortools.Error) {
@@ -207,61 +206,16 @@ func (service *Service) DownloadReport(url string) (*[]BulkReportChannelBasicA2,
 		return nil, e
 	}
 
-	skipRows := 1
-
 	data := []BulkReportChannelBasicA2{}
-	fieldCountStruct := reflect.TypeOf(BulkReportChannelBasicA2{}).NumField()
 
 	defer res.Body.Close()
 
 	r := csv.NewReader(res.Body)
-	r.Comma = []rune(";")[0]
+	r.Comma = []rune(",")[0]
 
-	row := 0
-	for {
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return nil, errortools.ErrorMessagef("Error while reading response of %s, row: %v, message: %s", url, row, err.Error())
-		}
-
-		if row >= skipRows {
-			fieldCountRecord := len(record)
-
-			if fieldCountRecord == fieldCountStruct-1 {
-
-				dr := BulkReportChannelBasicA2{
-					//FileName: file.Name,
-				}
-
-				fieldIndexStruct := 1 //first field contains filename
-				for fieldIndexStruct < fieldCountStruct {
-					fieldIndexRecord := fieldIndexStruct - 1
-					val := reflect.ValueOf(&dr)
-					s := val.Elem()
-					f := s.Field(fieldIndexStruct)
-
-					if f.IsValid() {
-						if f.CanSet() {
-							if f.Kind() == reflect.String {
-								f.SetString(record[fieldIndexRecord])
-							}
-						}
-					}
-
-					fieldIndexStruct++
-				}
-
-				data = append(data, dr)
-			} else {
-				return nil, errortools.ErrorMessagef("Row %v in response of %s contains %v fields instead of the expect %v fields.", row, url, fieldCountRecord, fieldCountStruct-1)
-			}
-		}
-
-		row++
+	e = fileio.GetCSVFromCSVReader(r, &data)
+	if e != nil {
+		return nil, e
 	}
 
 	return &data, nil

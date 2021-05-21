@@ -302,6 +302,14 @@ github.com/leapforce-libraries/go_errortools v0.0.0-20210419202804-48861072a520 
 github.com/leapforce-libraries/go_errortools v0.0.0-20210419202804-48861072a520/go.mod h1:qw2+jRSmAUBmnLgN9kgiadj31C2j7j4f9jSxuydSBHg=
 github.com/leapforce-libraries/go_errortools v0.0.0-20210421105612-afc8a27266b6 h1:xuiI+Pa+vjMLXZDWfh/ilfkcIWGgFIWwQrhtJ2gQYgQ=
 github.com/leapforce-libraries/go_errortools v0.0.0-20210421105612-afc8a27266b6/go.mod h1:qw2+jRSmAUBmnLgN9kgiadj31C2j7j4f9jSxuydSBHg=
+github.com/leapforce-libraries/go_excel v0.0.0-20201223160303-f602189b9301 h1:BIfM7OYvMuk4fd8XG2AypoNc6sMOmZDefbFErWEf0vw=
+github.com/leapforce-libraries/go_excel v0.0.0-20201223160303-f602189b9301/go.mod h1:5ZZirENAiYyHmP8AXwgtnyPNxv+fSLKmAsiMSeSmhqM=
+github.com/leapforce-libraries/go_fileio v0.0.0-20210408121905-2fbbdf80f9f0 h1:+ICaGxwebvjxzHi5eWKiKf37IFZvfpZ6jlrN49RbwF8=
+github.com/leapforce-libraries/go_fileio v0.0.0-20210408121905-2fbbdf80f9f0/go.mod h1:Ie/BAuLyGQF/sl+y2hA1radtv6XcJqQQhGZIpyzKGLQ=
+github.com/leapforce-libraries/go_fileio v0.0.0-20210521140502-871caf2071c7 h1:i0amYQPvOnwbnnzKQueo5YTk/Jelmf3gmTuLzKsGGrM=
+github.com/leapforce-libraries/go_fileio v0.0.0-20210521140502-871caf2071c7/go.mod h1:PtxlFx+bYYI/A5eOuGSF5CvFQxl9PG3nVAu3YdSfeKE=
+github.com/leapforce-libraries/go_fileio v0.0.0-20210521144908-378bb6c55dd2 h1:mqqIZLX851dqmli4c2zVH89E+Zh8UImEhe/52+sX7ZM=
+github.com/leapforce-libraries/go_fileio v0.0.0-20210521144908-378bb6c55dd2/go.mod h1:1bY/3aNqzgJLU9WYhBNEV+VlxwMidzwpqGfpLl9JBFE=
 github.com/leapforce-libraries/go_google v0.0.0-20210104162628-1ecb453bd184 h1:MDdSIldPLTI8xlrO/1ehZAVmxdTQBgq1xnZQSJgOIYw=
 github.com/leapforce-libraries/go_google v0.0.0-20210104162628-1ecb453bd184/go.mod h1:z9WMobg+D0rDCpaS0+wS9DphpTtty9fRqMYdPUaxf1o=
 github.com/leapforce-libraries/go_google v0.0.0-20210111150913-7d6be991b5f9 h1:cuV0UCvsWowYv3g7/EnZ4F9FBV+emiVGbffSC1zmhtQ=
@@ -382,6 +390,8 @@ github.com/leapforce-libraries/go_oauth2 v0.0.0-20210511205549-173bde1db0ec h1:4
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20210511205549-173bde1db0ec/go.mod h1:0ZpNPafyEOXlkq3xd85pwKC1w0xIoPsitp2IMN36lTg=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20210512133125-82d2301f9f30 h1:lQaOxiWXF6CkJcK2ucvolSk+tH83EDYQCxlvnpqjJs0=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20210512133125-82d2301f9f30/go.mod h1:oe3/D2ySjsUQquIQ+w4wpqm3Tu69NtdJFtlsbCJcb/E=
+github.com/leapforce-libraries/go_oauth2 v0.0.0-20210519202835-eb45207df19e h1:UftaaPWkCzZequbqMB8Y4hzGiqlr1EJcnUE3yU3Km78=
+github.com/leapforce-libraries/go_oauth2 v0.0.0-20210519202835-eb45207df19e/go.mod h1:oe3/D2ySjsUQquIQ+w4wpqm3Tu69NtdJFtlsbCJcb/E=
 github.com/leapforce-libraries/go_ratelimit v0.0.0-20210201165141-ecc8a678bf0e/go.mod h1:LrZKYgZGT7nrYTYXYPyYsbIl2B1q8WNp9xZfPOTJbnI=
 github.com/leapforce-libraries/go_twitter_new v0.0.0-20210429223350-68bbd15f6714 h1:Wu3elMcxcB4p7tds4RPnwz2CAAB0rOCF/rL5vHfOeWU=
 github.com/leapforce-libraries/go_twitter_new v0.0.0-20210429223350-68bbd15f6714/go.mod h1:WKJ98hWcmqGDRVlkw8rr5No9+FHlN2WeJjuKg1AvbUo=
@@ -417,6 +427,10 @@ github.com/leapforce-libraries/go_utilities v0.0.0-20210420212532-911e9816af98 h
 github.com/leapforce-libraries/go_utilities v0.0.0-20210420212532-911e9816af98/go.mod h1:fp9gPd4WpZ62d3/5l+NU6H1XgqpigCGMxLKxFO61vEA=
 github.com/leapforce-libraries/go_utilities v0.0.0-20210505125333-18b876c17d79 h1:uzLYanfq6sEf31Z+yjMnhPDm1bCn9PnzqcrCOnWi2gw=
 github.com/leapforce-libraries/go_utilities v0.0.0-20210505125333-18b876c17d79/go.mod h1:fp9gPd4WpZ62d3/5l+NU6H1XgqpigCGMxLKxFO61vEA=
+github.com/leapforce-libraries/go_utilities v0.0.0-20210521134701-397ec8d9dfab h1:KexfhRlRoJZJj4vczHTby3ma+mmosRUE0K2QpPI+XRQ=
+github.com/leapforce-libraries/go_utilities v0.0.0-20210521134701-397ec8d9dfab/go.mod h1:fp9gPd4WpZ62d3/5l+NU6H1XgqpigCGMxLKxFO61vEA=
+github.com/leapforce-libraries/go_utilities v0.0.0-20210521144836-5656f522a450 h1:mVJ/zYCgA1uyWNH5AEelCj4t2YA89y0bvF9gJwlPx/Y=
+github.com/leapforce-libraries/go_utilities v0.0.0-20210521144836-5656f522a450/go.mod h1:fp9gPd4WpZ62d3/5l+NU6H1XgqpigCGMxLKxFO61vEA=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/mattn/go-colorable v0.1.2/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
 github.com/mattn/go-isatty v0.0.7/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
@@ -470,6 +484,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+github.com/szyhf/go-convert v1.0.0 h1:L49o5JLMPzXYRggFqwNEzDw1gAQktpyWfKZqcPzEmX8=
+github.com/szyhf/go-convert v1.0.0/go.mod h1:BgotSGjAF33Z4fcU/fe8OPYZoo6mKiBiKvJ+FVih5UM=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
 github.com/ugorji/go v1.1.7/go.mod h1:kZn38zHttfInRq0xu/PH0az30d+z6vm202qpg1oXVMw=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
