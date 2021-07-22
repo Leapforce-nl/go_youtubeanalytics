@@ -239,6 +239,13 @@ func IDFromClientID(clientID string) string {
 	return strings.Split(clientID, ".")[0]
 }
 
+func (service *Service) InitToken(scope string, accessType *string, prompt *string, state *string) *errortools.Error {
+	if service.googleService == nil {
+		return nil
+	}
+	return service.googleService.InitToken(scope, accessType, prompt, state)
+}
+
 func (service *Service) APIName() string {
 	return apiName
 }
