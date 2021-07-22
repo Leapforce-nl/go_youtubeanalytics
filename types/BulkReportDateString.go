@@ -27,7 +27,6 @@ func (d *BulkReportDateString) UnmarshalJSON(b []byte) error {
 
 	err := json.Unmarshal(b, &s)
 	if err != nil {
-		fmt.Println(err)
 		return returnError()
 	}
 
