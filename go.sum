@@ -390,6 +390,8 @@ github.com/leapforce-libraries/go_google v0.0.0-20211007094709-ed8cdf457d35 h1:r
 github.com/leapforce-libraries/go_google v0.0.0-20211007094709-ed8cdf457d35/go.mod h1:0ojKOhGgBuQQQ4z2jbPEHIw6xgZav4M3oBdDUenPMCw=
 github.com/leapforce-libraries/go_google v0.0.0-20211007104642-17ee38a08764 h1:ftAl4cwHl6e7BL80jIUh+cf4i0el3rGHwVWYEY9ggok=
 github.com/leapforce-libraries/go_google v0.0.0-20211007104642-17ee38a08764/go.mod h1:TizKpW+R7M0HoxI5LIm69JdYJ05Hm0LFmtRRo0XKYHk=
+github.com/leapforce-libraries/go_google v0.0.0-20211007110056-b91881e1446a h1:UN3da2s4KO7SSyxj+KvWzVMWc28kCENF68/WjR5NJns=
+github.com/leapforce-libraries/go_google v0.0.0-20211007110056-b91881e1446a/go.mod h1:EBvnx7d2iGrAEQ8cyBo7lZuPY3r+rvuzccwjdRx/6e0=
 github.com/leapforce-libraries/go_googlecloudstorage v0.0.0-20210428222229-1147c7986a8d/go.mod h1:5vTKz3d/EqR85Ge5dN6+emiKfMDh73mibAQRs7wQz8k=
 github.com/leapforce-libraries/go_googlecloudstorage v0.0.0-20210512105628-d07f5f4332c1 h1:mI+rNmq/Y6va2epFYmEPlE7XNI3AinLe93DzjDamJu0=
 github.com/leapforce-libraries/go_googlecloudstorage v0.0.0-20210512105628-d07f5f4332c1/go.mod h1:5vTKz3d/EqR85Ge5dN6+emiKfMDh73mibAQRs7wQz8k=
@@ -469,6 +471,8 @@ github.com/leapforce-libraries/go_oauth2 v0.0.0-20210713192125-c6d80d675358 h1:T
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20210713192125-c6d80d675358/go.mod h1:qaqzJP0MtGLyV7v7rQ9ORBJ2iXHzZl0nD07ztA0efh8=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20211007104548-129a8e5e408f h1:Xa8YiOucTyKnwColLkfMcTKDybL2LszRVGtKIo9FzMM=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20211007104548-129a8e5e408f/go.mod h1:KbfdShvVAerXWgSpHGqUvJMQmh0vKu/ONWWI/J57R6M=
+github.com/leapforce-libraries/go_oauth2 v0.0.0-20211007110022-0a722af8e2e7 h1:vQa+Ri6w3lLtGom+jvtIpkCeMhYmZ0ZAthTyYvTNyAs=
+github.com/leapforce-libraries/go_oauth2 v0.0.0-20211007110022-0a722af8e2e7/go.mod h1:KbfdShvVAerXWgSpHGqUvJMQmh0vKu/ONWWI/J57R6M=
 github.com/leapforce-libraries/go_ratelimit v0.0.0-20210201165141-ecc8a678bf0e/go.mod h1:LrZKYgZGT7nrYTYXYPyYsbIl2B1q8WNp9xZfPOTJbnI=
 github.com/leapforce-libraries/go_twitter_new v0.0.0-20210429223350-68bbd15f6714 h1:Wu3elMcxcB4p7tds4RPnwz2CAAB0rOCF/rL5vHfOeWU=
 github.com/leapforce-libraries/go_twitter_new v0.0.0-20210429223350-68bbd15f6714/go.mod h1:WKJ98hWcmqGDRVlkw8rr5No9+FHlN2WeJjuKg1AvbUo=
