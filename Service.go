@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_google "github.com/leapforce-libraries/go_google"
@@ -19,18 +18,10 @@ const (
 	apiURLData      string = "https://youtube.googleapis.com/youtube/v3"
 )
 
-type AuthorizationMode string
-
-const (
-	AuthorizationModeOAuth2      AuthorizationMode = "oauth2"
-	AuthorizationModeAPIKey      AuthorizationMode = "apikey"
-	AuthorizationModeAccessToken AuthorizationMode = "accesstoken"
-)
-
 // Service stores Service configuration
 //
 type Service struct {
-	authorizationMode AuthorizationMode
+	authorizationMode go_google.AuthorizationMode
 	id                string
 	apiKey            *string
 	accessToken       *string
@@ -58,19 +49,19 @@ func NewServiceWithAPIKey(serviceConfig *ServiceConfigWithAPIKey) (*Service, *er
 	}
 
 	return &Service{
-		authorizationMode: AuthorizationModeAPIKey,
+		authorizationMode: go_google.AuthorizationModeAPIKey,
 		id:                serviceConfig.APIKey,
 		apiKey:            &serviceConfig.APIKey,
 		httpService:       httpService,
 	}, nil
 }
 
-type ServiceConfigWithAccessToken struct {
+type ServiceWithAccessTokenConfig struct {
 	ClientID    string
 	AccessToken string
 }
 
-func NewServiceWithAccessToken(serviceConfig *ServiceConfigWithAccessToken) (*Service, *errortools.Error) {
+func NewServiceWithAccessToken(serviceConfig *ServiceWithAccessTokenConfig) (*Service, *errortools.Error) {
 	if serviceConfig == nil {
 		return nil, errortools.ErrorMessage("ServiceConfig must not be a nil pointer")
 	}
@@ -85,9 +76,9 @@ func NewServiceWithAccessToken(serviceConfig *ServiceConfigWithAccessToken) (*Se
 	}
 
 	return &Service{
-		authorizationMode: AuthorizationModeAccessToken,
+		authorizationMode: go_google.AuthorizationModeAccessToken,
 		accessToken:       &serviceConfig.AccessToken,
-		id:                IDFromClientID(serviceConfig.ClientID),
+		id:                go_google.ClientIDShort(serviceConfig.ClientID),
 		httpService:       httpService,
 	}, nil
 }
@@ -134,24 +125,25 @@ func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools
 	}
 
 	return &Service{
-		authorizationMode: AuthorizationModeOAuth2,
-		id:                IDFromClientID(serviceConfig.ClientID),
+		authorizationMode: go_google.AuthorizationModeOAuth2,
+		id:                go_google.ClientIDShort(serviceConfig.ClientID),
 		googleService:     googleService,
 	}, nil
 }
 
-func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
-
+func (service *Service) httpRequest(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
 	var request *http.Request
 	var response *http.Response
 	var e *errortools.Error
 
-	if service.httpService != nil {
+	if service.authorizationMode == go_google.AuthorizationModeOAuth2 {
+		request, response, e = service.googleService.HTTPRequest(requestConfig)
+	} else {
 		// add error model
 		errorResponse := go_google.ErrorResponse{}
 		requestConfig.ErrorModel = &errorResponse
 
-		if service.apiKey != nil {
+		if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 			// add api key
 			requestConfig.SetParameter("key", *service.apiKey)
 		}
@@ -162,15 +154,13 @@ func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.Re
 			requestConfig.NonDefaultHeaders = &header
 		}
 
-		request, response, e = service.httpService.HTTPRequest(httpMethod, requestConfig)
+		request, response, e = service.httpService.HTTPRequest(requestConfig)
 
 		if e != nil {
 			if errorResponse.Error.Message != "" {
 				e.SetMessage(errorResponse.Error.Message)
 			}
 		}
-	} else if service.googleService != nil {
-		request, response, e = service.googleService.HTTPRequest(httpMethod, requestConfig)
 	}
 
 	if e != nil {
@@ -180,7 +170,7 @@ func (service *Service) httpRequest(httpMethod string, requestConfig *go_http.Re
 	return request, response, nil
 }
 
-func (service *Service) httpRequestWrapped(httpMethod string, requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
+func (service *Service) httpRequestWrapped(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
 
 	responseModel := requestConfig.ResponseModel
 
@@ -189,7 +179,7 @@ func (service *Service) httpRequestWrapped(httpMethod string, requestConfig *go_
 	_requestConfig := *requestConfig
 	_requestConfig.ResponseModel = &_response
 
-	request, response, e := service.httpRequest(httpMethod, &_requestConfig)
+	request, response, e := service.httpRequest(&_requestConfig)
 	if e != nil {
 		return request, response, nil, e
 	}
@@ -207,18 +197,6 @@ func (service *Service) httpRequestWrapped(httpMethod string, requestConfig *go_
 	return request, response, &_response, nil
 }
 
-func (service *Service) get(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
-	return service.httpRequest(http.MethodGet, requestConfig)
-}
-
-func (service *Service) getWrapped(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *Response, *errortools.Error) {
-	return service.httpRequestWrapped(http.MethodGet, requestConfig)
-}
-
-func (service *Service) post(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
-	return service.httpRequest(http.MethodPost, requestConfig)
-}
-
 func (service *Service) urlData(path string) string {
 	return fmt.Sprintf("%s/%s", apiURLData, path)
 }
@@ -233,10 +211,6 @@ func (service *Service) apiURLReporting(path string) string {
 
 func (service *Service) pay(quotaCosts int64) {
 	service.quotaCosts += quotaCosts
-}
-
-func IDFromClientID(clientID string) string {
-	return strings.Split(clientID, ".")[0]
 }
 
 func (service *Service) InitToken(scope string, accessType *string, prompt *string, state *string) *errortools.Error {

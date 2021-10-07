@@ -3,10 +3,12 @@ package youtube
 import (
 	"encoding/csv"
 	"fmt"
+	"net/http"
 	"net/url"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	fileio "github.com/leapforce-libraries/go_fileio"
+	go_google "github.com/leapforce-libraries/go_google"
 	go_http "github.com/leapforce-libraries/go_http"
 	y_types "github.com/leapforce-libraries/go_youtube/types"
 )
@@ -26,7 +28,7 @@ type CreateJobConfig struct {
 }
 
 func (service *Service) CreateJob(createJobConfig *CreateJobConfig) (*Job, *errortools.Error) {
-	if service.authorizationMode == AuthorizationModeAPIKey {
+	if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
 	}
 
@@ -37,12 +39,13 @@ func (service *Service) CreateJob(createJobConfig *CreateJobConfig) (*Job, *erro
 	job := Job{}
 
 	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodPost,
 		URL:           service.apiURLReporting("jobs"),
 		BodyModel:     createJobConfig,
 		ResponseModel: &job,
 	}
 	service.pay(1)
-	_, _, e := service.post(&requestConfig)
+	_, _, e := service.httpRequest(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
@@ -56,23 +59,24 @@ type GetJobsResponse struct {
 }
 
 func (service *Service) GetJobs() (*[]Job, *errortools.Error) {
-	if service.authorizationMode == AuthorizationModeAPIKey {
+	if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
 	}
 
 	jobs := []Job{}
 	values := url.Values{}
 
-	for true {
+	for {
 		getJobsResponse := GetJobsResponse{}
 
 		requestConfig := go_http.RequestConfig{
+			Method:        http.MethodGet,
 			URL:           service.apiURLReporting("jobs"),
 			Parameters:    &values,
 			ResponseModel: &getJobsResponse,
 		}
 		service.pay(1)
-		_, _, e := service.get(&requestConfig)
+		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}
@@ -116,7 +120,7 @@ type GetReportsResponse struct {
 }
 
 func (service *Service) GetReports(getReportsConfig *GetReportsConfig) (*[]Report, *errortools.Error) {
-	if service.authorizationMode == AuthorizationModeAPIKey {
+	if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
 	}
 
@@ -131,16 +135,17 @@ func (service *Service) GetReports(getReportsConfig *GetReportsConfig) (*[]Repor
 		values.Set("createdAfter", getReportsConfig.CreatedAfter.String())
 	}
 
-	for true {
+	for {
 		getReportsResponse := GetReportsResponse{}
 
 		requestConfig := go_http.RequestConfig{
+			Method:        http.MethodGet,
 			URL:           service.apiURLReporting(fmt.Sprintf("jobs/%s/reports", getReportsConfig.JobID)),
 			Parameters:    &values,
 			ResponseModel: &getReportsResponse,
 		}
 		service.pay(1)
-		_, _, e := service.get(&requestConfig)
+		_, _, e := service.httpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}
@@ -199,9 +204,10 @@ type BulkReportChannelBasicA2 struct {
 
 func (service *Service) DownloadReport(url string) (*[]BulkReportChannelBasicA2, *errortools.Error) {
 	requestConfig := go_http.RequestConfig{
-		URL: url,
+		Method: http.MethodGet,
+		URL:    url,
 	}
-	_, res, e := service.get(&requestConfig)
+	_, res, e := service.httpRequest(&requestConfig)
 	if e != nil {
 		return nil, e
 	}

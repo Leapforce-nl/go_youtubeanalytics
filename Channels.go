@@ -2,6 +2,7 @@ package youtube
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -98,12 +99,13 @@ func (service *Service) GetChannels(getChannelsConfig *GetChannelsConfig) (*[]Ch
 	channels := []Channel{}
 
 	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodGet,
 		URL:           service.urlData("channels"),
 		Parameters:    &values,
 		ResponseModel: &channels,
 	}
 	service.pay(1)
-	_, _, response, e := service.getWrapped(&requestConfig)
+	_, _, response, e := service.httpRequestWrapped(&requestConfig)
 	if e != nil {
 		return nil, nil, e
 	}

@@ -2,10 +2,12 @@ package youtube
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 
 	"cloud.google.com/go/civil"
 	errortools "github.com/leapforce-libraries/go_errortools"
+	go_google "github.com/leapforce-libraries/go_google"
 	go_http "github.com/leapforce-libraries/go_http"
 )
 
@@ -36,7 +38,7 @@ type DoTargetedQueryConfig struct {
 }
 
 func (service *Service) DoTargetedQuery(doTargetedQueryConfig *DoTargetedQueryConfig) (*TargetedQueryResult, *errortools.Error) {
-	if service.authorizationMode == AuthorizationModeAPIKey {
+	if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
 	}
 
@@ -89,12 +91,13 @@ func (service *Service) DoTargetedQuery(doTargetedQueryConfig *DoTargetedQueryCo
 	targetedQueryResult := TargetedQueryResult{}
 
 	requestConfig := go_http.RequestConfig{
+		Method:        http.MethodGet,
 		URL:           service.urlAnalytics("reports"),
 		Parameters:    &values,
 		ResponseModel: &targetedQueryResult,
 	}
 	service.pay(1)
-	_, _, e := service.get(&requestConfig)
+	_, _, e := service.httpRequest(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
