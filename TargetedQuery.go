@@ -9,13 +9,16 @@ import (
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_google "github.com/leapforce-libraries/go_google"
 	go_http "github.com/leapforce-libraries/go_http"
+	go_utilities "github.com/leapforce-libraries/go_utilities"
 )
 
-type TargetedQueryResult struct {
+type targetedQueryResult struct {
 	Kind          string          `json:"kind"`
 	ColumnHeaders []ColumnHeader  `json:"columnHeaders"`
 	Rows          [][]interface{} `json:"rows"`
 }
+
+type TargetedQueryResult []map[string]interface{}
 
 type ColumnHeader struct {
 	Name       string `json:"name"`
@@ -88,13 +91,13 @@ func (service *Service) DoTargetedQuery(doTargetedQueryConfig *DoTargetedQueryCo
 		values.Set("startIndex", fmt.Sprintf("%v", *doTargetedQueryConfig.StartIndex))
 	}
 
-	targetedQueryResult := TargetedQueryResult{}
+	_targetedQueryResult := targetedQueryResult{}
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodGet,
 		URL:           service.urlAnalytics("reports"),
 		Parameters:    &values,
-		ResponseModel: &targetedQueryResult,
+		ResponseModel: &_targetedQueryResult,
 	}
 	service.pay(1)
 	_, _, e := service.httpRequest(&requestConfig)
@@ -102,5 +105,49 @@ func (service *Service) DoTargetedQuery(doTargetedQueryConfig *DoTargetedQueryCo
 		return nil, e
 	}
 
-	return &targetedQueryResult, nil
+	t := TargetedQueryResult{}
+	e = t.parse(&_targetedQueryResult)
+	if e != nil {
+		return nil, e
+	}
+
+	return &t, nil
+}
+
+func (t *TargetedQueryResult) parse(res *targetedQueryResult) *errortools.Error {
+	if res == nil {
+		return nil
+	}
+
+	for _, row := range res.Rows {
+		res1 := make(map[string]interface{})
+
+		for i, columnHeader := range res.ColumnHeaders {
+			valueString := fmt.Sprintf("%v", row[i])
+			var value interface{}
+
+			switch columnHeader.DataType {
+			case "STRING":
+				value = valueString
+			case "INTEGER":
+				valueFloat64, err := go_utilities.ParseFloat(valueString)
+				if err != nil {
+					errortools.CaptureError(err)
+				}
+				value = int64(valueFloat64)
+			case "FLOAT":
+				valueFloat64, err := go_utilities.ParseFloat(valueString)
+				if err != nil {
+					errortools.CaptureError(err)
+				}
+				value = valueFloat64
+			}
+
+			res1[columnHeader.Name] = value
+		}
+
+		*t = append(*t, res1)
+	}
+
+	return nil
 }
