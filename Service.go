@@ -8,7 +8,7 @@ import (
 	errortools "github.com/leapforce-libraries/go_errortools"
 	go_google "github.com/leapforce-libraries/go_google"
 	go_http "github.com/leapforce-libraries/go_http"
-	oauth2 "github.com/leapforce-libraries/go_oauth2"
+	tokensource "github.com/leapforce-libraries/go_oauth2/tokensource"
 )
 
 const (
@@ -84,10 +84,9 @@ func NewServiceWithAccessToken(serviceConfig *ServiceWithAccessTokenConfig) (*Se
 }
 
 type ServiceConfigOAuth2 struct {
-	ClientID          string
-	ClientSecret      string
-	GetTokenFunction  *func() (*oauth2.Token, *errortools.Error)
-	SaveTokenFunction *func(token *oauth2.Token) *errortools.Error
+	ClientID     string
+	ClientSecret string
+	TokenSource  tokensource.TokenSource
 }
 
 func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools.Error) {
@@ -102,21 +101,12 @@ func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools
 	if serviceConfig.ClientSecret == "" {
 		return nil, errortools.ErrorMessage("ClientSecret not provided")
 	}
-	/*
-		getTokenFunction := func() (*oauth2.Token, *errortools.Error) {
-			return GetToken(serviceConfig.ClientID, serviceConfig.ChannelID)
-		}
-
-		saveTokenFunction := func(token *oauth2.Token) *errortools.Error {
-			return SaveToken(serviceConfig.ClientID, serviceConfig.ChannelID, token)
-		}*/
 
 	googleServiceConfig := go_google.ServiceConfig{
-		APIName:           apiName,
-		ClientID:          serviceConfig.ClientID,
-		ClientSecret:      serviceConfig.ClientSecret,
-		GetTokenFunction:  serviceConfig.GetTokenFunction,
-		SaveTokenFunction: serviceConfig.SaveTokenFunction,
+		APIName:      apiName,
+		ClientID:     serviceConfig.ClientID,
+		ClientSecret: serviceConfig.ClientSecret,
+		TokenSource:  serviceConfig.TokenSource,
 	}
 
 	googleService, e := go_google.NewService(&googleServiceConfig, nil)
