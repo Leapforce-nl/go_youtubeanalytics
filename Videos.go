@@ -16,6 +16,7 @@ type Video struct {
 	Etag       string          `json:"etag"`
 	ID         string          `json:"id"`
 	Snippet    VideoSnippet    `json:"snippet"`
+	Status     VideoStatus     `json:"status"`
 	Statistics VideoStatistics `json:"statistics"`
 }
 
@@ -32,6 +33,19 @@ type VideoSnippet struct {
 	DefaultLanguage      string                  `json:"defaultLanguage"`
 	Localized            Localized               `json:"localized"`
 	DefaultAudioLanguage string                  `json:"defaultAudioLanguage"`
+}
+
+type VideoStatus struct {
+	UploadStatus            string                  `json:"uploadStatus"`
+	FailureReason           string                  `json:"failureReason"`
+	RejectionReason         string                  `json:"rejectionReason"`
+	PrivacyStatus           string                  `json:"privacyStatus"`
+	PublishAt               *y_types.DateTimeString `json:"publishAt"`
+	License                 string                  `json:"license"`
+	Embeddable              bool                    `json:"embeddable"`
+	PublicStatsViewable     bool                    `json:"publicStatsViewable"`
+	MadeForKids             bool                    `json:"madeForKids"`
+	SelfDeclaredMadeForKids bool                    `json:"selfDeclaredMadeForKids"`
 }
 
 type VideoStatistics struct {
