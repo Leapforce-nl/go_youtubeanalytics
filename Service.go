@@ -109,7 +109,7 @@ func NewServiceOAuth2(serviceConfig *ServiceConfigOAuth2) (*Service, *errortools
 		TokenSource:  serviceConfig.TokenSource,
 	}
 
-	googleService, e := go_google.NewService(&googleServiceConfig, nil)
+	googleService, e := go_google.NewService(&googleServiceConfig)
 	if e != nil {
 		return nil, e
 	}
