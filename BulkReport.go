@@ -8,7 +8,6 @@ import (
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	fileio "github.com/leapforce-libraries/go_fileio"
-	go_google "github.com/leapforce-libraries/go_google"
 	go_http "github.com/leapforce-libraries/go_http"
 	y_types "github.com/leapforce-libraries/go_youtube/types"
 )
@@ -16,21 +15,21 @@ import (
 // Job //
 //
 type Job struct {
-	ID           string                 `json:"id"`
-	ReportTypeID string                 `json:"reportTypeId"`
+	Id           string                 `json:"id"`
+	ReportTypeId string                 `json:"reportTypeId"`
 	Name         string                 `json:"name"`
 	CreateTime   y_types.DateTimeString `json:"createTime"`
 }
 
 type CreateJobConfig struct {
-	ReportTypeID string `json:"reportTypeId"`
+	ReportTypeId string `json:"reportTypeId"`
 	Name         string `json:"name"`
 }
 
 func (service *Service) CreateJob(createJobConfig *CreateJobConfig) (*Job, *errortools.Error) {
-	if service.authorizationMode == go_google.AuthorizationModeAPIKey {
+	/*if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
-	}
+	}*/
 
 	if createJobConfig == nil {
 		return nil, errortools.ErrorMessage("CreateJobConfig is nil")
@@ -40,12 +39,12 @@ func (service *Service) CreateJob(createJobConfig *CreateJobConfig) (*Job, *erro
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodPost,
-		URL:           service.apiURLReporting("jobs"),
+		Url:           service.apiUrlReporting("jobs"),
 		BodyModel:     createJobConfig,
 		ResponseModel: &job,
 	}
-	service.pay(1)
-	_, _, e := service.httpRequest(&requestConfig)
+
+	_, _, e := service.googleService().HttpRequest(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
@@ -59,9 +58,9 @@ type GetJobsResponse struct {
 }
 
 func (service *Service) GetJobs() (*[]Job, *errortools.Error) {
-	if service.authorizationMode == go_google.AuthorizationModeAPIKey {
+	/*if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
-	}
+	}*/
 
 	jobs := []Job{}
 	values := url.Values{}
@@ -71,12 +70,12 @@ func (service *Service) GetJobs() (*[]Job, *errortools.Error) {
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.apiURLReporting("jobs"),
+			Url:           service.apiUrlReporting("jobs"),
 			Parameters:    &values,
 			ResponseModel: &getJobsResponse,
 		}
-		service.pay(1)
-		_, _, e := service.httpRequest(&requestConfig)
+
+		_, _, e := service.googleService().HttpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}
@@ -100,17 +99,17 @@ func (service *Service) GetJobs() (*[]Job, *errortools.Error) {
 // Report //
 //
 type Report struct {
-	ID            string                  `json:"id"`
-	JobID         string                  `json:"jobId"`
+	Id            string                  `json:"id"`
+	JobId         string                  `json:"jobId"`
 	StartTime     y_types.DateTimeString  `json:"startTime"`
 	EndTime       y_types.DateTimeString  `json:"endTime"`
 	CreateTime    y_types.DateTimeString  `json:"createTime"`
 	JobExpireTime *y_types.DateTimeString `json:"jobExpireTime"`
-	DownloadURL   string                  `json:"downloadUrl"`
+	DownloadUrl   string                  `json:"downloadUrl"`
 }
 
 type GetReportsConfig struct {
-	JobID        string
+	JobId        string
 	CreatedAfter *y_types.DateTimeString
 }
 
@@ -120,9 +119,9 @@ type GetReportsResponse struct {
 }
 
 func (service *Service) GetReports(getReportsConfig *GetReportsConfig) (*[]Report, *errortools.Error) {
-	if service.authorizationMode == go_google.AuthorizationModeAPIKey {
+	/*if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
-	}
+	}*/
 
 	if getReportsConfig == nil {
 		return nil, errortools.ErrorMessage("GetReportsConfig is nil")
@@ -140,12 +139,12 @@ func (service *Service) GetReports(getReportsConfig *GetReportsConfig) (*[]Repor
 
 		requestConfig := go_http.RequestConfig{
 			Method:        http.MethodGet,
-			URL:           service.apiURLReporting(fmt.Sprintf("jobs/%s/reports", getReportsConfig.JobID)),
+			Url:           service.apiUrlReporting(fmt.Sprintf("jobs/%s/reports", getReportsConfig.JobId)),
 			Parameters:    &values,
 			ResponseModel: &getReportsResponse,
 		}
-		service.pay(1)
-		_, _, e := service.httpRequest(&requestConfig)
+
+		_, _, e := service.googleService().HttpRequest(&requestConfig)
 		if e != nil {
 			return nil, e
 		}
@@ -168,8 +167,8 @@ func (service *Service) GetReports(getReportsConfig *GetReportsConfig) (*[]Repor
 
 type BulkReportChannelBasicA2 struct {
 	Date                           y_types.BulkReportDateString `csv:"date"`
-	ChannelID                      string                       `csv:"channel_id"`
-	VideoID                        string                       `csv:"video_id"`
+	ChannelId                      string                       `csv:"channel_id"`
+	VideoId                        string                       `csv:"video_id"`
 	LiveOrOnDemand                 string                       `csv:"live_or_on_demand"`
 	SubscribedStatus               string                       `csv:"subscribed_status"`
 	CountryCode                    string                       `csv:"country_code"`
@@ -205,9 +204,9 @@ type BulkReportChannelBasicA2 struct {
 func (service *Service) DownloadReport(url string) (*[]BulkReportChannelBasicA2, *errortools.Error) {
 	requestConfig := go_http.RequestConfig{
 		Method: http.MethodGet,
-		URL:    url,
+		Url:    url,
 	}
-	_, res, e := service.httpRequest(&requestConfig)
+	_, res, e := service.googleService().HttpRequest(&requestConfig)
 	if e != nil {
 		return nil, e
 	}

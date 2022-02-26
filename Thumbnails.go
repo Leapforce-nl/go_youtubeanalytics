@@ -9,7 +9,7 @@ type Thumbnails struct {
 }
 
 type Thumbnail struct {
-	URL    string `json:"url"`
+	Url    string `json:"url"`
 	Width  int64  `json:"width"`
 	Height int64  `json:"height"`
 }

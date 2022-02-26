@@ -14,7 +14,7 @@ import (
 type Video struct {
 	Kind       string          `json:"kind"`
 	Etag       string          `json:"etag"`
-	ID         string          `json:"id"`
+	Id         string          `json:"id"`
 	Snippet    VideoSnippet    `json:"snippet"`
 	Status     VideoStatus     `json:"status"`
 	Statistics VideoStatistics `json:"statistics"`
@@ -22,13 +22,13 @@ type Video struct {
 
 type VideoSnippet struct {
 	PublishedAt          *y_types.DateTimeString `json:"publishedAt"`
-	ChannelID            string                  `json:"channelId"`
+	ChannelId            string                  `json:"channelId"`
 	Title                string                  `json:"title"`
 	Description          string                  `json:"description"`
 	Thumbnails           Thumbnails              `json:"thumbnails"`
 	ChannelTitle         string                  `json:"channelTitle"`
 	Tags                 []string                `json:"tags"`
-	CategoryID           uint64                  `json:"categoryId,string"`
+	CategoryId           uint64                  `json:"categoryId,string"`
 	LiveBroadcastContent string                  `json:"liveBroadcastContent"`
 	DefaultLanguage      string                  `json:"defaultLanguage"`
 	Localized            Localized               `json:"localized"`
@@ -61,7 +61,7 @@ type VideoPart string
 const (
 	VideoPartContentDetails       VideoPart = "contentDetails"
 	VideoPartFileDetails          VideoPart = "fileDetails"
-	VideoPartID                   VideoPart = "id"
+	VideoPartId                   VideoPart = "id"
 	VideoPartLiveStreamingDetails VideoPart = "liveStreamingDetails"
 	VideoPartLocalizations        VideoPart = "localizations"
 	VideoPartPlayer               VideoPart = "player"
@@ -77,7 +77,7 @@ const (
 type GetVideosConfig struct {
 	Part                   []VideoPart
 	Chart                  *string
-	ID                     *string
+	Id                     *string
 	MyRating               *string
 	H1                     *string
 	MaxHeight              *uint64
@@ -86,7 +86,7 @@ type GetVideosConfig struct {
 	OnBehalfOfContentOwner *string
 	PageToken              *string
 	RegionCode             *string
-	VideoCategoryID        *string
+	VideoCategoryId        *string
 }
 
 func (service *Service) GetVideos(getVideosConfig *GetVideosConfig) (*[]Video, *string, *errortools.Error) {
@@ -102,8 +102,8 @@ func (service *Service) GetVideos(getVideosConfig *GetVideosConfig) (*[]Video, *
 		values.Set("chart", *getVideosConfig.Chart)
 	}
 
-	if getVideosConfig.ID != nil {
-		values.Set("id", *getVideosConfig.ID)
+	if getVideosConfig.Id != nil {
+		values.Set("id", *getVideosConfig.Id)
 	}
 
 	if getVideosConfig.MyRating != nil {
@@ -138,19 +138,19 @@ func (service *Service) GetVideos(getVideosConfig *GetVideosConfig) (*[]Video, *
 		values.Set("regionCode", *getVideosConfig.RegionCode)
 	}
 
-	if getVideosConfig.VideoCategoryID != nil {
-		values.Set("videoCategoryId", *getVideosConfig.VideoCategoryID)
+	if getVideosConfig.VideoCategoryId != nil {
+		values.Set("videoCategoryId", *getVideosConfig.VideoCategoryId)
 	}
 
 	videos := []Video{}
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodGet,
-		URL:           service.urlData("videos"),
+		Url:           service.urlData("videos"),
 		Parameters:    &values,
 		ResponseModel: &videos,
 	}
-	service.pay(1)
+
 	_, _, response, e := service.httpRequestWrapped(&requestConfig)
 	if e != nil {
 		return nil, nil, e

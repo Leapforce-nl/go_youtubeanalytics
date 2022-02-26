@@ -14,19 +14,19 @@ import (
 type SearchResult struct {
 	Kind       string                 `json:"kind"`
 	Etag       string                 `json:"etag"`
-	ID         SearchResultID         `json:"id"`
+	Id         SearchResultId         `json:"id"`
 	Snippet    SearchResultSnippet    `json:"snippet"`
 	Statistics SearchResultStatistics `json:"statistics"`
 }
 
-type SearchResultID struct {
+type SearchResultId struct {
 	Kind    string `json:"kind"`
-	VideoID string `json:"videoId"`
+	VideoId string `json:"videoId"`
 }
 
 type SearchResultSnippet struct {
 	PublishedAt          *y_types.DateTimeString `json:"publishedAt"`
-	ChannelID            string                  `json:"channelId"`
+	ChannelId            string                  `json:"channelId"`
 	Title                string                  `json:"title"`
 	Description          string                  `json:"description"`
 	Thumbnails           Thumbnails              `json:"thumbnails"`
@@ -159,8 +159,8 @@ type SearchConfig struct {
 	ForContentOwner        *bool
 	ForDeveloper           *bool
 	ForMine                *bool
-	RelatedToVideoID       *string
-	ChannelID              *string
+	RelatedToVideoId       *string
+	ChannelId              *string
 	ChannelType            *ChannelType
 	EventType              *EventType
 	Location               *string
@@ -175,10 +175,10 @@ type SearchConfig struct {
 	RegionCode             *string
 	RelevanceLanguage      *string
 	SafeSearch             *SafeSearch
-	TopicID                *string
+	TopicId                *string
 	Type                   *SearchType
 	VideoCaption           *VideoCaption
-	VideoCategoryID        *string
+	VideoCategoryId        *string
 	VideoDefinition        *VideoDefinition
 	VideoDimension         *VideoDimension
 	VideoDuration          *VideoDuration
@@ -209,12 +209,12 @@ func (service *Service) Search(searchConfig *SearchConfig) (*[]SearchResult, *st
 		values.Set("forMine", fmt.Sprintf("%v", *searchConfig.ForMine))
 	}
 
-	if searchConfig.RelatedToVideoID != nil {
-		values.Set("relatedToVideoId", *searchConfig.RelatedToVideoID)
+	if searchConfig.RelatedToVideoId != nil {
+		values.Set("relatedToVideoId", *searchConfig.RelatedToVideoId)
 	}
 
-	if searchConfig.ChannelID != nil {
-		values.Set("channelId", *searchConfig.ChannelID)
+	if searchConfig.ChannelId != nil {
+		values.Set("channelId", *searchConfig.ChannelId)
 	}
 
 	if searchConfig.ChannelType != nil {
@@ -265,8 +265,8 @@ func (service *Service) Search(searchConfig *SearchConfig) (*[]SearchResult, *st
 		values.Set("safeSearch", fmt.Sprintf("%v", *searchConfig.SafeSearch))
 	}
 
-	if searchConfig.TopicID != nil {
-		values.Set("topicId", *searchConfig.TopicID)
+	if searchConfig.TopicId != nil {
+		values.Set("topicId", *searchConfig.TopicId)
 	}
 
 	if searchConfig.Type != nil {
@@ -277,8 +277,8 @@ func (service *Service) Search(searchConfig *SearchConfig) (*[]SearchResult, *st
 		values.Set("videoCaption", fmt.Sprintf("%v", *searchConfig.VideoCaption))
 	}
 
-	if searchConfig.VideoCategoryID != nil {
-		values.Set("videoCategoryId", *searchConfig.VideoCategoryID)
+	if searchConfig.VideoCategoryId != nil {
+		values.Set("videoCategoryId", *searchConfig.VideoCategoryId)
 	}
 
 	if searchConfig.VideoDefinition != nil {
@@ -313,11 +313,11 @@ func (service *Service) Search(searchConfig *SearchConfig) (*[]SearchResult, *st
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodGet,
-		URL:           service.urlData("search"),
+		Url:           service.urlData("search"),
 		Parameters:    &values,
 		ResponseModel: &searchResults,
 	}
-	service.pay(100)
+
 	_, _, response, e := service.httpRequestWrapped(&requestConfig)
 	if e != nil {
 		return nil, nil, e

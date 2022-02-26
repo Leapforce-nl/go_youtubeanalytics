@@ -14,7 +14,7 @@ import (
 type Channel struct {
 	Kind       string            `json:"kind"`
 	Etag       string            `json:"etag"`
-	ID         string            `json:"id"`
+	Id         string            `json:"id"`
 	Snippet    ChannelSnippet    `json:"snippet"`
 	Statistics ChannelStatistics `json:"statistics"`
 }
@@ -22,7 +22,7 @@ type Channel struct {
 type ChannelSnippet struct {
 	Title       string                  `json:"title"`
 	Description string                  `json:"description"`
-	CustomURL   string                  `json:"customUrl"`
+	CustomUrl   string                  `json:"customUrl"`
 	PublishedAt *y_types.DateTimeString `json:"publishedAt"`
 	Thumbnails  Thumbnails              `json:"thumbnails"`
 	Localized   Localized               `json:"localized"`
@@ -44,7 +44,7 @@ const (
 	ChannelPartBrandingSettings    ChannelPart = "brandingSettings"
 	ChannelPartContentDetails      ChannelPart = "contentDetails"
 	ChannelPartContentOwnerDetails ChannelPart = "contentOwnerDetails"
-	ChannelPartID                  ChannelPart = "id"
+	ChannelPartId                  ChannelPart = "id"
 	ChannelPartLocalizations       ChannelPart = "localizations"
 	ChannelPartSnippet             ChannelPart = "snippet"
 	ChannelPartStatistics          ChannelPart = "statistics"
@@ -55,7 +55,7 @@ const (
 type GetChannelsConfig struct {
 	Part                   []ChannelPart
 	ForUserName            *string
-	ID                     *string
+	Id                     *string
 	ManagedByMe            *bool
 	Mine                   *bool
 	H1                     *string
@@ -76,8 +76,8 @@ func (service *Service) GetChannels(getChannelsConfig *GetChannelsConfig) (*[]Ch
 		values.Set("forUserName", *getChannelsConfig.ForUserName)
 	}
 
-	if getChannelsConfig.ID != nil {
-		values.Set("id", *getChannelsConfig.ID)
+	if getChannelsConfig.Id != nil {
+		values.Set("id", *getChannelsConfig.Id)
 	}
 
 	if getChannelsConfig.ManagedByMe != nil {
@@ -100,11 +100,11 @@ func (service *Service) GetChannels(getChannelsConfig *GetChannelsConfig) (*[]Ch
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodGet,
-		URL:           service.urlData("channels"),
+		Url:           service.urlData("channels"),
 		Parameters:    &values,
 		ResponseModel: &channels,
 	}
-	service.pay(1)
+
 	_, _, response, e := service.httpRequestWrapped(&requestConfig)
 	if e != nil {
 		return nil, nil, e

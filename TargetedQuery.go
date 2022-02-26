@@ -7,7 +7,6 @@ import (
 
 	"cloud.google.com/go/civil"
 	errortools "github.com/leapforce-libraries/go_errortools"
-	go_google "github.com/leapforce-libraries/go_google"
 	go_http "github.com/leapforce-libraries/go_http"
 	go_utilities "github.com/leapforce-libraries/go_utilities"
 )
@@ -28,7 +27,7 @@ type ColumnHeader struct {
 
 type DoTargetedQueryConfig struct {
 	EndDate                      *civil.Date
-	IDs                          *string
+	Ids                          *string
 	Metrics                      *string
 	StartDate                    *civil.Date
 	Currency                     *string
@@ -41,9 +40,9 @@ type DoTargetedQueryConfig struct {
 }
 
 func (service *Service) DoTargetedQuery(doTargetedQueryConfig *DoTargetedQueryConfig) (*TargetedQueryResult, *errortools.Error) {
-	if service.authorizationMode == go_google.AuthorizationModeAPIKey {
+	/*if service.authorizationMode == go_google.AuthorizationModeAPIKey {
 		return nil, errortools.ErrorMessage("OAuth2 authorization required for this endpoint")
-	}
+	}*/
 
 	values := url.Values{}
 
@@ -51,8 +50,8 @@ func (service *Service) DoTargetedQuery(doTargetedQueryConfig *DoTargetedQueryCo
 		values.Set("endDate", doTargetedQueryConfig.EndDate.String())
 	}
 
-	if doTargetedQueryConfig.IDs != nil {
-		values.Set("ids", *doTargetedQueryConfig.IDs)
+	if doTargetedQueryConfig.Ids != nil {
+		values.Set("ids", *doTargetedQueryConfig.Ids)
 	}
 
 	if doTargetedQueryConfig.Metrics != nil {
@@ -95,12 +94,12 @@ func (service *Service) DoTargetedQuery(doTargetedQueryConfig *DoTargetedQueryCo
 
 	requestConfig := go_http.RequestConfig{
 		Method:        http.MethodGet,
-		URL:           service.urlAnalytics("reports"),
+		Url:           service.urlAnalytics("reports"),
 		Parameters:    &values,
 		ResponseModel: &_targetedQueryResult,
 	}
-	service.pay(1)
-	_, _, e := service.httpRequest(&requestConfig)
+
+	_, _, e := service.googleService().HttpRequest(&requestConfig)
 	if e != nil {
 		return nil, e
 	}
