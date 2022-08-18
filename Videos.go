@@ -92,7 +92,7 @@ type GetVideosConfig struct {
 func (service *Service) GetVideos(getVideosConfig *GetVideosConfig) (*[]Video, *string, *errortools.Error) {
 	values := url.Values{}
 
-	videoParts := []string{}
+	var videoParts []string
 	for _, videoPart := range getVideosConfig.Part {
 		videoParts = append(videoParts, string(videoPart))
 	}
